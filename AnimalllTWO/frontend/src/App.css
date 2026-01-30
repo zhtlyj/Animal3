@@ -24,6 +24,31 @@ body {
     radial-gradient(circle at 60px 60px, rgba(208, 208, 240, 0.2) 1px, transparent 1px);
   background-size: 120px 120px, 80px 80px, 40px 40px;
   background-position: 0 0, 0 0, 0 0;
+  position: relative;
+}
+
+/* 全局背景水印 - 使用 history-item-icon 样式 */
+.App::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background-image: 
+    /* 爪印图标水印 🐾 - 颜色更深 */
+    url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:0.3'/%3E%3Cstop offset='100%25' style='stop-color:%23764ba2;stop-opacity:0.3'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' x='68' y='68' rx='16' fill='url(%23grad1)'/%3E%3Ctext x='100' y='115' font-size='48' text-anchor='middle' fill='%23667eea' opacity='0.4'%3E🐾%3C/text%3E%3C/svg%3E");
+  background-size: 300px 300px;
+  background-position: 0 0;
+  opacity: 1;
+}
+
+/* 确保内容在水印之上 */
+.App > * {
+  position: relative;
+  z-index: 1;
 }
 
 .container {
@@ -1723,6 +1748,30 @@ body {
   min-height: calc(100vh - 70px);
   background: #8B5CF6;
   padding: 40px 20px;
+  position: relative;
+}
+
+/* 捐赠中心页面水印 */
+.donate-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:0.3'/%3E%3Cstop offset='100%25' style='stop-color:%23764ba2;stop-opacity:0.3'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' x='68' y='68' rx='16' fill='url(%23grad1)'/%3E%3Ctext x='100' y='115' font-size='48' text-anchor='middle' fill='%23667eea' opacity='0.4'%3E🐾%3C/text%3E%3C/svg%3E");
+  background-size: 300px 300px;
+  background-position: 0 0;
+  opacity: 1;
+}
+
+/* 确保捐赠中心页面内容在水印之上 */
+.donate-page > * {
+  position: relative;
+  z-index: 1;
 }
 
 .donate-header {
@@ -2061,6 +2110,30 @@ body {
   min-height: calc(100vh - 70px);
   background: linear-gradient(180deg, #8B5CF6 0%, #7C3AED 30%, #6D28D9 70%, #5B21B6 100%);
   padding: 40px 20px;
+  position: relative;
+}
+
+/* 历史记录页面水印 */
+.history-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:0.3'/%3E%3Cstop offset='100%25' style='stop-color:%23764ba2;stop-opacity:0.3'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' x='68' y='68' rx='16' fill='url(%23grad1)'/%3E%3Ctext x='100' y='115' font-size='48' text-anchor='middle' fill='%23667eea' opacity='0.4'%3E🐾%3C/text%3E%3C/svg%3E");
+  background-size: 300px 300px;
+  background-position: 0 0;
+  opacity: 1;
+}
+
+/* 确保历史记录页面内容在水印之上 */
+.history-page > * {
+  position: relative;
+  z-index: 1;
 }
 
 .history-header {
@@ -2521,6 +2594,30 @@ body {
   min-height: calc(100vh - 70px);
   background: #8B5CF6;
   padding: 40px 20px;
+  position: relative;
+}
+
+/* 发布页面水印 */
+.publish-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:0.3'/%3E%3Cstop offset='100%25' style='stop-color:%23764ba2;stop-opacity:0.3'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' x='68' y='68' rx='16' fill='url(%23grad1)'/%3E%3Ctext x='100' y='115' font-size='48' text-anchor='middle' fill='%23667eea' opacity='0.4'%3E🐾%3C/text%3E%3C/svg%3E");
+  background-size: 300px 300px;
+  background-position: 0 0;
+  opacity: 1;
+}
+
+/* 确保发布页面内容在水印之上 */
+.publish-page > * {
+  position: relative;
+  z-index: 1;
 }
 
 .publish-header {
@@ -4035,6 +4132,30 @@ body {
   min-height: calc(100vh - 70px);
   background: #8B5CF6;
   padding: 40px 20px;
+  position: relative;
+}
+
+/* 申请管理页面水印 */
+.adoption-management-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:0.3'/%3E%3Cstop offset='100%25' style='stop-color:%23764ba2;stop-opacity:0.3'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' x='68' y='68' rx='16' fill='url(%23grad1)'/%3E%3Ctext x='100' y='115' font-size='48' text-anchor='middle' fill='%23667eea' opacity='0.4'%3E🐾%3C/text%3E%3C/svg%3E");
+  background-size: 300px 300px;
+  background-position: 0 0;
+  opacity: 1;
+}
+
+/* 确保申请管理页面内容在水印之上 */
+.adoption-management-page > * {
+  position: relative;
+  z-index: 1;
 }
 
 .management-header {
@@ -4637,6 +4758,30 @@ body {
   min-height: calc(100vh - 70px);
   background: #8B5CF6;
   padding: 40px 20px;
+  position: relative;
+}
+
+/* 动物详情页面水印 */
+.animal-detail-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:0.3'/%3E%3Cstop offset='100%25' style='stop-color:%23764ba2;stop-opacity:0.3'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' x='68' y='68' rx='16' fill='url(%23grad1)'/%3E%3Ctext x='100' y='115' font-size='48' text-anchor='middle' fill='%23667eea' opacity='0.4'%3E🐾%3C/text%3E%3C/svg%3E");
+  background-size: 300px 300px;
+  background-position: 0 0;
+  opacity: 1;
+}
+
+/* 确保动物详情页面内容在水印之上 */
+.animal-detail-page > * {
+  position: relative;
+  z-index: 1;
 }
 
 .detail-container {
