@@ -33,6 +33,10 @@ const AnimalDetailPage = () => {
         const response = await animalsAPI.getAnimalById(id);
         if (response.success) {
           const animal = response.data.animal;
+          console.log('📋 加载的动物数据:', animal);
+          console.log('📋 NFT信息:', animal.nft);
+          console.log('📋 交易哈希:', animal.nft?.txHash);
+          console.log('📋 合约地址:', animal.nft?.contractAddress);
           setItem(animal);
           
           // 同步收藏和点赞状态到 AnimalsContext
@@ -374,27 +378,57 @@ const AnimalDetailPage = () => {
                 区块链信息
               </h3>
               <div className="blockchain-content">
-                {item.nft ? (
-                  <div className="nft-info">
-                    <div className="nft-item">
-                      <span className="nft-label">合约地址：</span>
-                      <span className="nft-value">{item.nft.contractAddress || '未设置'}</span>
-                    </div>
-                    <div className="nft-item">
-                      <span className="nft-label">Token ID：</span>
-                      <span className="nft-value">{item.nft.tokenId || '未设置'}</span>
-                    </div>
-                    <div className="nft-item">
-                      <span className="nft-label">交易哈希：</span>
-                      <span className="nft-value">{item.nft.txHash ? `${item.nft.txHash.slice(0, 16)}...` : '未设置'}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="no-nft">
-                    <span className="no-nft-icon">🔗</span>
-                    <span className="no-nft-text">暂未上链</span>
-                  </div>
-                )}
+                {(() => {
+                  // 判断是否已上链（有tokenId且不为空）
+                  const hasTokenId = item.nft?.tokenId && 
+                                    item.nft.tokenId !== '' && 
+                                    item.nft.tokenId !== 'null' && 
+                                    item.nft.tokenId !== 'undefined' &&
+                                    item.nft.tokenId !== 'unknown';
+                  
+                  if (hasTokenId) {
+                    // 已上链，显示Token ID、交易哈希和上链状态
+                    const hasTxHash = item.nft?.txHash && 
+                                     item.nft.txHash !== '' && 
+                                     item.nft.txHash !== 'null' && 
+                                     item.nft.txHash !== 'undefined';
+                    
+                    return (
+                      <div className="nft-info">
+                        <div className="nft-item">
+                          <span className="nft-label">Token ID：</span>
+                          <span className="nft-value">{item.nft.tokenId}</span>
+                        </div>
+                        {hasTxHash && (
+                          <div className="nft-item">
+                            <span className="nft-label">交易哈希：</span>
+                            <span className="nft-value nft-txhash">{item.nft.txHash}</span>
+                          </div>
+                        )}
+                        <div className="nft-item">
+                          <span className="nft-label">上链状态：</span>
+                          <span className="nft-value nft-status-onchain">
+                            ✅ 已上链
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  } else {
+                    // 未上链
+                    return (
+                      <div className="no-nft">
+                        <span className="no-nft-icon">🔗</span>
+                        <span className="no-nft-text">暂未上链</span>
+                        <div className="nft-item" style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #e2e8f0' }}>
+                          <span className="nft-label">上链状态：</span>
+                          <span className="nft-value nft-status-offchain">
+                            ⏳ 未上链
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
+                })()}
               </div>
             </div>
           </div>

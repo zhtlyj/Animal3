@@ -45,6 +45,7 @@ const History = () => {
                 category: '动物操作',
                 animalId: animal._id || animal.id,
                 animalName: animal.name,
+                animalCover: animal.cover || (animal.media && animal.media[0]) || null,
                 record: record,
                 timestamp: new Date(record.at),
                 blockchain: animal.nft || {}
@@ -63,11 +64,15 @@ const History = () => {
             applications.forEach(app => {
               // 从动物数据中获取区块链信息（如果存在）
               const blockchain = app.blockchain || {};
+              const animal = app.animal || {};
+              // 优先使用API返回的animalImage，其次使用animal对象的cover或media
+              const animalCover = app.animalImage || animal.cover || (animal.media && animal.media[0]) || null;
               historyItems.push({
                 type: 'adoption',
                 category: '领养申请',
                 animalId: app.animalId || app.animal?._id,
                 animalName: app.animalName || app.animal?.name || '未知动物',
+                animalCover: animalCover,
                 status: app.status,
                 message: app.message,
                 timestamp: new Date(app.applicationDate || app.createdAt),
@@ -319,6 +324,17 @@ const History = () => {
                 <div className="history-item-icon">
                   {getTypeIcon(item.type)}
                 </div>
+                {(item.type === 'animal' || item.type === 'adoption') && item.animalCover && (
+                  <div className="history-item-image">
+                    <img 
+                      src={item.animalCover} 
+                      alt={item.animalName || '动物照片'}
+                      onError={(e) => {
+                        e.target.src = 'https://images.unsplash.com/photo-1517849845537-4d257902454a?q=80&w=400&auto=format&fit=crop';
+                      }}
+                    />
+                  </div>
+                )}
                 <div className="history-item-content">
                   <div className="history-item-header">
                     <div className="history-item-title">

@@ -2164,6 +2164,31 @@ body {
   box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
 }
 
+.history-item-image {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.history-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.history-item-image:hover img {
+  transform: scale(1.05);
+}
+
 .history-item-content {
   flex: 1;
   display: flex;
@@ -2459,6 +2484,11 @@ body {
   .history-tab {
     padding: 10px 16px;
     font-size: 14px;
+  }
+  
+  .history-item-image {
+    width: 100px;
+    height: 100px;
   }
   
   .history-item {
@@ -5001,9 +5031,10 @@ body {
 .nft-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 8px 0;
   border-bottom: 1px solid #f1f5f9;
+  gap: 12px;
 }
 
 .nft-item:last-child {
@@ -5023,6 +5054,10 @@ body {
   background: #f7fafc;
   padding: 4px 8px;
   border-radius: 6px;
+  word-break: break-all;
+  text-align: right;
+  flex: 1;
+  max-width: 70%;
 }
 
 .no-nft {
@@ -5042,6 +5077,36 @@ body {
 .no-nft-text {
   font-size: 14px;
   font-weight: 500;
+}
+
+.nft-status-onchain {
+  color: #10b981;
+  font-weight: 700;
+  background: #d1fae5;
+  padding: 4px 12px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.nft-status-offchain {
+  color: #f59e0b;
+  font-weight: 700;
+  background: #fef3c7;
+  padding: 4px 12px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.nft-txhash {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #4a5568;
+  background: #f7fafc;
+  padding: 4px 8px;
+  border-radius: 6px;
+  word-break: break-all;
+  max-width: 100%;
+  display: inline-block;
 }
 
 /* 历史记录 */

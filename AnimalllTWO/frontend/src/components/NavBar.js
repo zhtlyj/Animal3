@@ -93,12 +93,13 @@ const NavBar = () => {
         >
           首页
         </Link>
-        {(!user || user.userType !== '领养人') && (
+        {/* 捐赠中心：仅救助组织可见，游客和领养人不可见 */}
+        {user && user.userType === '救助组织' && (
           <Link 
             to="/donate" 
             className={`nav-link ${isActive('/donate') ? 'active' : ''}`}
           >
-            捐赠中心
+            💝 捐赠中心
           </Link>
         )}
         {user && user.userType === '救助组织' && (

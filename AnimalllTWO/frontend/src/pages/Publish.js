@@ -134,11 +134,18 @@ const Publish = () => {
             const nftUpdateData = {
               nft: {
                 tokenId: nftResult.tokenId,
-                contractAddress: nftResult.contract,
+                contractAddress: nftResult.contract || process.env.REACT_APP_CONTRACT_ADDRESS || '0x5FbDB2315678afecb367f032d93F642f64180aa3',
                 metadataURI: metadataURI,
                 txHash: nftResult.txHash
               }
             };
+            
+            console.log('📋 NFT更新数据详情:', {
+              tokenId: nftUpdateData.nft.tokenId,
+              contractAddress: nftUpdateData.nft.contractAddress,
+              txHash: nftUpdateData.nft.txHash,
+              metadataURI: nftUpdateData.nft.metadataURI
+            });
             
             console.log('💾 更新数据库NFT信息:', nftUpdateData);
             await updateAnimal(animal._id, nftUpdateData);
