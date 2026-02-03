@@ -132,6 +132,43 @@ const History = () => {
         }
       }
 
+      // 4. 获取捐赠者的捐赠历史（仅捐赠者获取）
+      if (user.userType === '捐赠者') {
+        try {
+          console.log('📋 开始获取捐赠历史，用户类型:', user.userType);
+          // 获取所有捐赠记录，不限制数量
+          const donationsResponse = await donationsAPI.getDonationHistory({ page: 1, limit: 1000 });
+          console.log('📋 捐赠历史API响应:', donationsResponse);
+          
+          if (donationsResponse && donationsResponse.success) {
+            // 兼容不同的返回数据结构
+            const donations = donationsResponse.data?.donations || donationsResponse.donations || [];
+            console.log('📋 解析到的捐赠记录数量:', donations.length);
+            
+            donations.forEach(donation => {
+              historyItems.push({
+                type: 'donation',
+                category: '捐赠',
+                amount: donation.amount,
+                method: donation.method,
+                projectId: donation.project?._id || donation.projectId,
+                projectTitle: donation.project?.title || '通用捐赠',
+                txHash: donation.transaction?.txHash || donation.txHash || donation.blockchain?.txHash,
+                blockchainDonationId: donation.blockchainDonationId,
+                timestamp: new Date(donation.createdAt || donation.timestamp)
+              });
+            });
+            
+            console.log('✅ 成功添加', donations.length, '条捐赠记录到历史');
+          } else {
+            console.warn('⚠️ 捐赠历史API返回失败:', donationsResponse?.message || donationsResponse?.error);
+          }
+        } catch (error) {
+          console.error('❌ 获取捐赠历史失败:', error);
+          // 即使获取失败，也不影响其他历史记录的显示
+        }
+      }
+
       // 按时间排序（最新的在前）
       historyItems.sort((a, b) => b.timestamp - a.timestamp);
       setHistory(historyItems);
@@ -287,6 +324,7 @@ const History = () => {
         if (activeTab === 'animals') return item.type === 'animal';
         if (activeTab === 'adoptions') return item.type === 'adoption';
         if (activeTab === 'projects') return item.type === 'project';
+        if (activeTab === 'donations') return item.type === 'donation';
         return true;
       });
 
@@ -336,6 +374,15 @@ const History = () => {
             onClick={() => setActiveTab('projects')}
           >
             💝 捐赠项目发布记录
+          </button>
+        )}
+        {/* 捐赠记录标签页：仅捐赠者可见 */}
+        {user.userType === '捐赠者' && (
+          <button
+            className={`history-tab ${activeTab === 'donations' ? 'active' : ''}`}
+            onClick={() => setActiveTab('donations')}
+          >
+            💝 捐赠记录
           </button>
         )}
       </div>
