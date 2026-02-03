@@ -85,27 +85,41 @@ const History = () => {
         }
       }
 
-      // 3. 获取用户的捐赠历史
-      try {
-        const donationsResponse = await donationsAPI.getDonationHistory();
-        if (donationsResponse && donationsResponse.success) {
-          const donations = donationsResponse.data?.donations || [];
-          donations.forEach(donation => {
-            historyItems.push({
-              type: 'donation',
-              category: '捐赠',
-              amount: donation.amount,
-              method: donation.method,
-              projectId: donation.project?._id || donation.projectId,
-              projectTitle: donation.project?.title || '通用捐赠',
-              txHash: donation.transaction?.txHash || donation.txHash || donation.blockchain?.txHash,
-              blockchainDonationId: donation.blockchainDonationId,
-              timestamp: new Date(donation.createdAt)
+      // 3. 获取用户的捐赠历史（仅救助组织获取）
+      if (user.userType === '救助组织') {
+        try {
+          console.log('📋 开始获取捐赠历史，用户类型:', user.userType);
+          // 获取所有捐赠记录，不限制数量
+          const donationsResponse = await donationsAPI.getDonationHistory({ page: 1, limit: 1000 });
+          console.log('📋 捐赠历史API响应:', donationsResponse);
+          
+          if (donationsResponse && donationsResponse.success) {
+            // 兼容不同的返回数据结构
+            const donations = donationsResponse.data?.donations || donationsResponse.donations || [];
+            console.log('📋 解析到的捐赠记录数量:', donations.length);
+            
+            donations.forEach(donation => {
+              historyItems.push({
+                type: 'donation',
+                category: '捐赠',
+                amount: donation.amount,
+                method: donation.method,
+                projectId: donation.project?._id || donation.projectId,
+                projectTitle: donation.project?.title || '通用捐赠',
+                txHash: donation.transaction?.txHash || donation.txHash || donation.blockchain?.txHash,
+                blockchainDonationId: donation.blockchainDonationId,
+                timestamp: new Date(donation.createdAt || donation.timestamp)
+              });
             });
-          });
+            
+            console.log('✅ 成功添加', donations.length, '条捐赠记录到历史');
+          } else {
+            console.warn('⚠️ 捐赠历史API返回失败:', donationsResponse?.message || donationsResponse?.error);
+          }
+        } catch (error) {
+          console.error('❌ 获取捐赠历史失败:', error);
+          // 即使获取失败，也不影响其他历史记录的显示
         }
-      } catch (error) {
-        console.error('获取捐赠历史失败:', error);
       }
 
       // 按时间排序（最新的在前）
@@ -299,12 +313,15 @@ const History = () => {
             ❤️ 领养申请
           </button>
         )}
-        <button
-          className={`history-tab ${activeTab === 'donations' ? 'active' : ''}`}
-          onClick={() => setActiveTab('donations')}
-        >
-          💝 捐赠记录
-        </button>
+        {/* 捐赠记录标签页：仅救助组织可见 */}
+        {user.userType === '救助组织' && (
+          <button
+            className={`history-tab ${activeTab === 'donations' ? 'active' : ''}`}
+            onClick={() => setActiveTab('donations')}
+          >
+            💝 捐赠记录
+          </button>
+        )}
       </div>
 
       {/* 历史记录列表 */}
