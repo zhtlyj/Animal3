@@ -85,39 +85,49 @@ const History = () => {
         }
       }
 
-      // 3. 获取用户的捐赠历史（仅救助组织获取）
+      // 3. 获取救助组织创建的项目列表（仅救助组织获取）
       if (user.userType === '救助组织') {
         try {
-          console.log('📋 开始获取捐赠历史，用户类型:', user.userType);
-          // 获取所有捐赠记录，不限制数量
-          const donationsResponse = await donationsAPI.getDonationHistory({ page: 1, limit: 1000 });
-          console.log('📋 捐赠历史API响应:', donationsResponse);
+          console.log('📋 开始获取项目列表，用户类型:', user.userType);
+          // 获取所有项目，然后过滤出当前用户创建的
+          const projectsResponse = await donationsAPI.getProjects({ page: 1, limit: 1000 });
+          console.log('📋 项目列表API响应:', projectsResponse);
           
-          if (donationsResponse && donationsResponse.success) {
+          if (projectsResponse && projectsResponse.success) {
             // 兼容不同的返回数据结构
-            const donations = donationsResponse.data?.donations || donationsResponse.donations || [];
-            console.log('📋 解析到的捐赠记录数量:', donations.length);
+            const allProjects = projectsResponse.data?.projects || projectsResponse.projects || [];
+            // 过滤出当前用户创建的项目
+            const userId = user._id || user.id;
+            const myProjects = allProjects.filter(project => {
+              const creatorId = project.creator?._id || project.creator || project.creatorId;
+              return creatorId?.toString() === userId?.toString();
+            });
             
-            donations.forEach(donation => {
+            console.log('📋 解析到的项目总数:', allProjects.length, '，当前用户创建的项目数:', myProjects.length);
+            
+            myProjects.forEach(project => {
               historyItems.push({
-                type: 'donation',
-                category: '捐赠',
-                amount: donation.amount,
-                method: donation.method,
-                projectId: donation.project?._id || donation.projectId,
-                projectTitle: donation.project?.title || '通用捐赠',
-                txHash: donation.transaction?.txHash || donation.txHash || donation.blockchain?.txHash,
-                blockchainDonationId: donation.blockchainDonationId,
-                timestamp: new Date(donation.createdAt || donation.timestamp)
+                type: 'project',
+                category: '捐赠项目发布',
+                projectId: project._id || project.id,
+                projectTitle: project.title,
+                projectDescription: project.description,
+                projectGoal: project.goal,
+                projectCurrentAmount: project.currentAmount || 0,
+                projectType: project.type,
+                projectStatus: project.status,
+                txHash: project.blockchain?.txHash,
+                blockchainProjectId: project.blockchain?.projectId,
+                timestamp: new Date(project.createdAt || project.timestamp)
               });
             });
             
-            console.log('✅ 成功添加', donations.length, '条捐赠记录到历史');
+            console.log('✅ 成功添加', myProjects.length, '条项目发布记录到历史');
           } else {
-            console.warn('⚠️ 捐赠历史API返回失败:', donationsResponse?.message || donationsResponse?.error);
+            console.warn('⚠️ 项目列表API返回失败:', projectsResponse?.message || projectsResponse?.error);
           }
         } catch (error) {
-          console.error('❌ 获取捐赠历史失败:', error);
+          console.error('❌ 获取项目列表失败:', error);
           // 即使获取失败，也不影响其他历史记录的显示
         }
       }
@@ -147,6 +157,10 @@ const History = () => {
             const itemId = `${item.type}-${item.projectId}-${item.timestamp.toISOString()}`;
             txHashes.push({ hash: item.txHash, itemId, index });
             console.log('🔍 添加捐赠交易:', { hash: item.txHash, itemId, projectId: item.projectId });
+          } else if (item.type === 'project' && item.txHash) {
+            const itemId = `${item.type}-${item.projectId}-${item.timestamp.toISOString()}`;
+            txHashes.push({ hash: item.txHash, itemId, index });
+            console.log('🔍 添加项目发布交易:', { hash: item.txHash, itemId, projectId: item.projectId });
           }
         });
 
@@ -231,6 +245,8 @@ const History = () => {
         return '❤️';
       case 'donation':
         return '💝';
+      case 'project':
+        return '💝';
       default:
         return '📝';
     }
@@ -270,7 +286,7 @@ const History = () => {
     : history.filter(item => {
         if (activeTab === 'animals') return item.type === 'animal';
         if (activeTab === 'adoptions') return item.type === 'adoption';
-        if (activeTab === 'donations') return item.type === 'donation';
+        if (activeTab === 'projects') return item.type === 'project';
         return true;
       });
 
@@ -313,13 +329,13 @@ const History = () => {
             ❤️ 领养申请
           </button>
         )}
-        {/* 捐赠记录标签页：仅救助组织可见 */}
+        {/* 捐赠项目发布记录标签页：仅救助组织可见 */}
         {user.userType === '救助组织' && (
           <button
-            className={`history-tab ${activeTab === 'donations' ? 'active' : ''}`}
-            onClick={() => setActiveTab('donations')}
+            className={`history-tab ${activeTab === 'projects' ? 'active' : ''}`}
+            onClick={() => setActiveTab('projects')}
           >
-            💝 捐赠记录
+            💝 捐赠项目发布记录
           </button>
         )}
       </div>
@@ -385,6 +401,12 @@ const History = () => {
                           {item.projectTitle && (
                             <span className="history-project">- {item.projectTitle}</span>
                           )}
+                        </>
+                      )}
+                      {item.type === 'project' && (
+                        <>
+                          <span className="history-category">{item.category}</span>
+                          <span className="history-project-title">{item.projectTitle}</span>
                         </>
                       )}
                     </div>
@@ -531,6 +553,81 @@ const History = () => {
                         )}
                       </>
                     )}
+                    {item.type === 'project' && (
+                      <>
+                        <div className="history-detail-row">
+                          <span>项目类型: {item.projectType}</span>
+                          <span style={{ marginLeft: '16px' }}>目标金额: ¥{item.projectGoal}</span>
+                          <span style={{ marginLeft: '16px' }}>当前金额: ¥{item.projectCurrentAmount}</span>
+                        </div>
+                        {item.projectDescription && (
+                          <div className="history-detail-text" style={{ marginTop: '8px' }}>
+                            {item.projectDescription}
+                          </div>
+                        )}
+                        {item.txHash && (
+                          <div className="blockchain-info">
+                            <div className="blockchain-header">
+                              <span className="blockchain-icon">⛓️</span>
+                              <span className="blockchain-label">区块链信息</span>
+                            </div>
+                            <div className="blockchain-details">
+                              <div className="blockchain-item">
+                                <span className="blockchain-key">交易哈希:</span>
+                                <span className="blockchain-value">{item.txHash}</span>
+                              </div>
+                              {item.blockchainProjectId && (
+                                <div className="blockchain-item">
+                                  <span className="blockchain-key">项目ID:</span>
+                                  <span className="blockchain-value">{item.blockchainProjectId}</span>
+                                </div>
+                              )}
+                              {(() => {
+                                const itemId = `${item.type}-${item.projectId}-${item.timestamp.toISOString()}`;
+                                const txDetails = txDetailsMap[itemId];
+                                if (loadingTxDetails && !txDetails) {
+                                  return (
+                                    <div className="blockchain-loading">
+                                      <span>⏳ 正在加载区块链信息...</span>
+                                    </div>
+                                  );
+                                }
+                                return txDetails ? (
+                                  <>
+                                    {txDetails.blockNumber && (
+                                      <div className="blockchain-item">
+                                        <span className="blockchain-key">区块号:</span>
+                                        <span className="blockchain-value">{txDetails.blockNumber}</span>
+                                      </div>
+                                    )}
+                                    {txDetails.gasUsed && (
+                                      <div className="blockchain-item">
+                                        <span className="blockchain-key">Gas使用:</span>
+                                        <span className="blockchain-value">{parseInt(txDetails.gasUsed).toLocaleString()}</span>
+                                      </div>
+                                    )}
+                                    {txDetails.gasFee && (
+                                      <div className="blockchain-item">
+                                        <span className="blockchain-key">Gas费用:</span>
+                                        <span className="blockchain-value">{parseFloat(txDetails.gasFee).toFixed(6)} ETH</span>
+                                      </div>
+                                    )}
+                                    {txDetails.status && (
+                                      <div className="blockchain-item">
+                                        <span className="blockchain-key">状态:</span>
+                                        <span className={`blockchain-status ${txDetails.status}`}>
+                                          {txDetails.status === 'success' ? '✅ 成功' : txDetails.status === 'pending' ? '⏳ 待确认' : '❌ 失败'}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </>
+                                ) : null;
+                              })()}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
                     {item.type === 'donation' && (
                       <>
                         <div className="history-detail-row">
@@ -626,6 +723,14 @@ const History = () => {
                       </a>
                     )}
                     {item.type === 'donation' && item.projectId && (
+                      <a
+                        href={`/donate?project=${item.projectId}`}
+                        className="history-action-link"
+                      >
+                        查看项目详情 →
+                      </a>
+                    )}
+                    {item.type === 'project' && item.projectId && (
                       <a
                         href={`/donate?project=${item.projectId}`}
                         className="history-action-link"
